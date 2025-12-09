@@ -1,451 +1,379 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, ShoppingCart, FileText, Download, Menu, X, Receipt } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Shop Billing System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-export default function GrowsayBilling() {
-  const [activeTab, setActiveTab] = useState('newBill');
-  const [bills, setBills] = useState([]);
-  const [showMenu, setShowMenu] = useState(false);
-  const [currentBill, setCurrentBill] = useState({
-    customer: '',
-    phone: '',
-    items: [],
-    date: new Date().toISOString().split('T')[0]
-  });
-  const [newItem, setNewItem] = useState({
-    name: '',
-    quantity: 1,
-    price: 0
-  });
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-  const addItemToBill = () => {
-    if (newItem.name && newItem.quantity > 0 && newItem.price > 0) {
-      setCurrentBill({
-        ...currentBill,
-        items: [...currentBill.items, { ...newItem, id: Date.now() }]
-      });
-      setNewItem({ name: '', quantity: 1, price: 0 });
-    }
-  };
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
 
-  const removeItem = (id) => {
-    setCurrentBill({
-      ...currentBill,
-      items: currentBill.items.filter(item => item.id !== id)
-    });
-  };
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
 
-  const calculateTotal = () => {
-    return currentBill.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-  };
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
 
-  const saveBill = () => {
-    if (currentBill.customer && currentBill.items.length > 0) {
-      const billWithTotal = {
-        ...currentBill,
-        id: Date.now(),
-        total: calculateTotal(),
-        billNumber: `GS${Date.now().toString().slice(-6)}`
-      };
-      setBills([billWithTotal, ...bills]);
-      setCurrentBill({
-        customer: '',
-        phone: '',
-        items: [],
-        date: new Date().toISOString().split('T')[0]
-      });
-      alert('✅ Bill saved successfully!');
-      setActiveTab('history');
-    } else {
-      alert('⚠️ Please add customer name and at least one item');
-    }
-  };
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
 
-  const printBill = (bill) => {
-    const printWindow = window.open('', '', 'height=600,width=800');
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Invoice - ${bill.billNumber}</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: 'Arial', sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
-            .header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #16a34a; padding-bottom: 15px; }
-            .header h1 { font-size: 32px; color: #16a34a; margin-bottom: 5px; }
-            .header p { color: #666; font-size: 14px; }
-            .info { margin: 25px 0; background: #f9fafb; padding: 15px; border-radius: 8px; }
-            .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
-            .info-row:last-child { border-bottom: none; }
-            .info-row strong { color: #374151; }
-            table { width: 100%; border-collapse: collapse; margin: 25px 0; }
-            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-            th { background-color: #16a34a; color: white; font-weight: 600; }
-            tbody tr:hover { background-color: #f9fafb; }
-            .text-right { text-align: right; }
-            .total-section { margin-top: 30px; text-align: right; }
-            .total-row { display: flex; justify-content: flex-end; padding: 10px 0; font-size: 18px; }
-            .total-row span:first-child { margin-right: 30px; font-weight: 600; }
-            .grand-total { font-size: 24px; font-weight: bold; color: #16a34a; padding-top: 15px; border-top: 2px solid #16a34a; }
-            .footer { margin-top: 50px; text-align: center; padding-top: 20px; border-top: 1px solid #e5e7eb; }
-            .footer p { color: #6b7280; font-size: 13px; margin: 5px 0; }
-            @media print {
-              body { padding: 10px; }
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .items-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .items-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-row.total {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            border-bottom: none;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
             }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>🌱 GROWSAY SHOP</h1>
-            <p>Tax Invoice / Bill of Supply</p>
-          </div>
-          <div class="info">
-            <div class="info-row">
-              <span><strong>Bill Number:</strong></span>
-              <span>${bill.billNumber}</span>
-            </div>
-            <div class="info-row">
-              <span><strong>Date:</strong></span>
-              <span>${new Date(bill.date).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
-            </div>
-            <div class="info-row">
-              <span><strong>Customer Name:</strong></span>
-              <span>${bill.customer}</span>
-            </div>
-            ${bill.phone ? `
-            <div class="info-row">
-              <span><strong>Phone:</strong></span>
-              <span>${bill.phone}</span>
-            </div>
-            ` : ''}
-          </div>
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 10%;">#</th>
-                <th style="width: 45%;">Item Description</th>
-                <th style="width: 15%;" class="text-right">Qty</th>
-                <th style="width: 15%;" class="text-right">Price (₹)</th>
-                <th style="width: 15%;" class="text-right">Amount (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${bill.items.map((item, index) => `
-                <tr>
-                  <td>${index + 1}</td>
-                  <td>${item.name}</td>
-                  <td class="text-right">${item.quantity}</td>
-                  <td class="text-right">${item.price.toFixed(2)}</td>
-                  <td class="text-right">${(item.quantity * item.price).toFixed(2)}</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-          <div class="total-section">
-            <div class="total-row grand-total">
-              <span>Grand Total:</span>
-              <span>₹ ${bill.total.toFixed(2)}</span>
-            </div>
-          </div>
-          <div class="footer">
-            <p><strong>Thank you for your business!</strong></p>
-            <p>Growsay Shop - Quality Products, Trusted Service</p>
-            <p>For any queries, please contact us</p>
-          </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.print();
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      {/* Mobile-Friendly Header */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <ShoppingCart size={32} className="animate-pulse" />
-              <div>
-                <h1 className="text-xl md:text-2xl font-bold">Growsay Shop</h1>
-                <p className="text-xs md:text-sm text-green-100">Billing System</p>
-              </div>
-            </div>
-            
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="md:hidden p-2 rounded-lg hover:bg-green-700 transition"
-            >
-              {showMenu ? <X size={24} /> : <Menu size={24} />}
-            </button>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex gap-3">
-              <button
-                onClick={() => setActiveTab('newBill')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition ${
-                  activeTab === 'newBill'
-                    ? 'bg-white text-green-600'
-                    : 'bg-green-700 text-white hover:bg-green-800'
-                }`}
-              >
-                <Plus size={20} />
-                <span className="hidden sm:inline">New Bill</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('history')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition ${
-                  activeTab === 'history'
-                    ? 'bg-white text-green-600'
-                    : 'bg-green-700 text-white hover:bg-green-800'
-                }`}
-              >
-                <FileText size={20} />
-                <span className="hidden sm:inline">History</span>
-                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{bills.length}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Navigation Menu */}
-          {showMenu && (
-            <div className="md:hidden mt-4 space-y-2">
-              <button
-                onClick={() => {
-                  setActiveTab('newBill');
-                  setShowMenu(false);
-                }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-semibold transition ${
-                  activeTab === 'newBill'
-                    ? 'bg-white text-green-600'
-                    : 'bg-green-700 text-white'
-                }`}
-              >
-                <Plus size={20} />
-                New Bill
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab('history');
-                  setShowMenu(false);
-                }}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg font-semibold transition ${
-                  activeTab === 'history'
-                    ? 'bg-white text-green-600'
-                    : 'bg-green-700 text-white'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <FileText size={20} />
-                  Bill History
-                </div>
-                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">{bills.length}</span>
-              </button>
-            </div>
-          )}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Fresh Mart Grocery</h1>
+            <p>Your Friendly Neighborhood Store</p>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto p-4 pb-20">
-        {/* New Bill Tab */}
-        {activeTab === 'newBill' && (
-          <div className="space-y-4 mt-4">
-            {/* Customer Info Card */}
-            <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
-              <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <Receipt className="text-green-600" size={24} />
-                Customer Details
-              </h2>
-              
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
-                    Customer Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={currentBill.customer}
-                    onChange={(e) => setCurrentBill({ ...currentBill, customer: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                    placeholder="Enter customer name"
-                  />
+        <div class="main-content">
+            <div class="section">
+                <h2>Add Item</h2>
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <select id="itemName">
+                        <option value="">Select Item</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Banana">Banana</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Milk">Milk</option>
+                        <option value="Bread">Bread</option>
+                        <option value="Eggs">Eggs</option>
+                        <option value="Rice">Rice (1kg)</option>
+                        <option value="Sugar">Sugar (1kg)</option>
+                        <option value="Oil">Cooking Oil (1L)</option>
+                        <option value="Tomato">Tomato</option>
+                        <option value="Potato">Potato</option>
+                        <option value="Onion">Onion</option>
+                    </select>
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-                    <input
-                      type="tel"
-                      value={currentBill.phone}
-                      onChange={(e) => setCurrentBill({ ...currentBill, phone: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                      placeholder="Enter phone"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Date</label>
-                    <input
-                      type="date"
-                      value={currentBill.date}
-                      onChange={(e) => setCurrentBill({ ...currentBill, date: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Add Item Card */}
-            <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Add Item</h3>
-              
-              <div className="space-y-3">
-                <div>
-                  <input
-                    type="text"
-                    value={newItem.name}
-                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                    placeholder="Item name"
-                  />
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" min="1" value="1">
                 </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="number"
-                    value={newItem.quantity}
-                    onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                    placeholder="Qty"
-                    min="1"
-                  />
-                  <input
-                    type="number"
-                    value={newItem.price}
-                    onChange={(e) => setNewItem({ ...newItem, price: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                    placeholder="Price ₹"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-                
-                <button
-                  onClick={addItemToBill}
-                  className="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 font-semibold text-base shadow-md"
-                >
-                  <Plus size={20} />
-                  Add to Bill
-                </button>
-              </div>
-            </div>
 
-            {/* Items List */}
-            {currentBill.items.length > 0 && (
-              <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Bill Items ({currentBill.items.length})</h3>
-                
-                <div className="space-y-2">
-                  {currentBill.items.map((item, index) => (
-                    <div key={item.id} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                      <div className="flex justify-between items-start gap-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-gray-800 truncate">{index + 1}. {item.name}</div>
-                          <div className="text-sm text-gray-600 mt-1">
-                            {item.quantity} × ₹{item.price.toFixed(2)} = <span className="font-semibold text-green-600">₹{(item.quantity * item.price).toFixed(2)}</span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition flex-shrink-0"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                <div class="form-group">
+                    <label for="price">Price per Unit (₹)</label>
+                    <input type="number" id="price" step="0.01" min="0">
+                </div>
+
+                <button class="btn" onclick="addItem()">Add to Bill</button>
+
+                <div class="summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">₹0.00</span>
                     </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 pt-4 border-t-2 border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-gray-700">Total Amount:</span>
-                    <span className="text-2xl md:text-3xl font-bold text-green-600">₹{calculateTotal().toFixed(2)}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={saveBill}
-                  className="w-full mt-4 bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition font-bold text-lg shadow-lg"
-                >
-                  💾 Save Bill
-                </button>
-              </div>
-            )}
-
-            {currentBill.items.length === 0 && (
-              <div className="bg-white rounded-xl shadow-md p-8 text-center">
-                <ShoppingCart size={64} className="mx-auto mb-4 text-gray-300" />
-                <p className="text-gray-500">No items added yet. Add items to create a bill.</p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Bill History Tab */}
-        {activeTab === 'history' && (
-          <div className="mt-4">
-            <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
-              <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <FileText className="text-green-600" size={24} />
-                Bill History
-              </h2>
-              
-              {bills.length === 0 ? (
-                <div className="text-center py-12">
-                  <FileText size={64} className="mx-auto mb-4 text-gray-300" />
-                  <p className="text-lg text-gray-500 mb-2">No bills yet</p>
-                  <p className="text-sm text-gray-400">Create your first bill to get started!</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {bills.map((bill) => (
-                    <div key={bill.id} className="border-2 border-gray-200 rounded-lg p-4 hover:shadow-lg hover:border-green-300 transition">
-                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">
-                              #{bill.billNumber}
-                            </span>
-                            <span className="text-xs text-gray-500">{new Date(bill.date).toLocaleDateString('en-IN')}</span>
-                          </div>
-                          <div className="font-semibold text-gray-800 text-lg">{bill.customer}</div>
-                          {bill.phone && <div className="text-sm text-gray-600">📞 {bill.phone}</div>}
-                          <div className="text-sm text-gray-600 mt-1">
-                            {bill.items.length} item{bill.items.length !== 1 ? 's' : ''}
-                          </div>
-                        </div>
-                        <div className="flex sm:flex-col items-center sm:items-end gap-2">
-                          <div className="text-2xl font-bold text-green-600 flex-1 sm:flex-none">
-                            ₹{bill.total.toFixed(2)}
-                          </div>
-                          <button
-                            onClick={() => printBill(bill)}
-                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2 text-sm font-semibold shadow-md whitespace-nowrap"
-                          >
-                            <Download size={16} />
-                            Print
-                          </button>
-                        </div>
-                      </div>
+                    <div class="summary-row">
+                        <span>Tax (5%):</span>
+                        <span id="tax">₹0.00</span>
                     </div>
-                  ))}
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="total">₹0.00</span>
+                    </div>
                 </div>
-              )}
+
+                <button class="btn btn-secondary" onclick="generateBill()">Generate Bill</button>
+                <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
             </div>
-          </div>
-        )}
-      </div>
+
+            <div class="section">
+                <h2>Bill Items</h2>
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center; color: #999;">No items added yet</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-  );
-}
+
+    <script>
+        let items = [];
+
+        const itemPrices = {
+            'Apple': 120,
+            'Banana': 50,
+            'Orange': 80,
+            'Milk': 60,
+            'Bread': 40,
+            'Eggs': 80,
+            'Rice': 60,
+            'Sugar': 45,
+            'Oil': 150,
+            'Tomato': 40,
+            'Potato': 30,
+            'Onion': 35
+        };
+
+        document.getElementById('itemName').addEventListener('change', function() {
+            const item = this.value;
+            if (item && itemPrices[item]) {
+                document.getElementById('price').value = itemPrices[item];
+            }
+        });
+
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+            const price = parseFloat(document.getElementById('price').value);
+
+            if (!name || !qty || !price) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const total = qty * price;
+            items.push({ name, qty, price, total });
+
+            updateTable();
+            updateSummary();
+
+            document.getElementById('itemName').value = '';
+            document.getElementById('quantity').value = 1;
+            document.getElementById('price').value = '';
+        }
+
+        function deleteItem(index) {
+            items.splice(index, 1);
+            updateTable();
+            updateSummary();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('itemsBody');
+            
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No items added yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = items.map((item, index) => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>₹${item.price.toFixed(2)}</td>
+                    <td>₹${item.total.toFixed(2)}</td>
+                    <td><button class="delete-btn" onclick="deleteItem(${index})">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateSummary() {
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+
+            document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('tax').textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function generateBill() {
+            if (items.length === 0) {
+                alert('No items to generate bill');
+                return;
+            }
+
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+
+            let billText = '====== FRESH MART GROCERY ======\n\n';
+            billText += 'Date: ' + new Date().toLocaleDateString() + '\n';
+            billText += 'Time: ' + new Date().toLocaleTimeString() + '\n\n';
+            billText += '--------------------------------\n';
+            
+            items.forEach(item => {
+                billText += `${item.name}\n`;
+                billText += `  ${item.qty} x ₹${item.price.toFixed(2)} = ₹${item.total.toFixed(2)}\n`;
+            });
+            
+            billText += '--------------------------------\n';
+            billText += `Subtotal: ₹${subtotal.toFixed(2)}\n`;
+            billText += `Tax (5%): ₹${tax.toFixed(2)}\n`;
+            billText += `TOTAL: ₹${total.toFixed(2)}\n`;
+            billText += '================================\n';
+            billText += 'Thank you for shopping with us!\n';
+
+            alert(billText);
+            console.log(billText);
+        }
+
+        function clearAll() {
+            if (items.length === 0 || confirm('Are you sure you want to clear all items?')) {
+                items = [];
+                updateTable();
+                updateSummary();
+            }
+        }
+    </script>
+</body>
+</html>
