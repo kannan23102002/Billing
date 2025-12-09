@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grocery Shop Billing System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            margin-top: 10px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .items-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .items-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .summary-row.total {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            border-bottom: none;
+            margin-top: 10px;
+        }
+
+        .items-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .header p {
+                font-size: 0.9em;
+            }
+
+            .main-content {
+                padding: 15px;
+                gap: 20px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .section h2 {
+                font-size: 1.2em;
+            }
+
+            .items-table {
+                font-size: 12px;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 8px 4px;
+            }
+
+            .delete-btn {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .summary {
+                padding: 15px;
+            }
+
+            .summary-row {
+                font-size: 14px;
+            }
+
+            .summary-row.total {
+                font-size: 1.2em;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .bill-content {
+                padding: 20px;
+                width: 95%;
+            }
+
+            .bill-header h1 {
+                font-size: 1.5em;
+            }
+
+            .bill-header p {
+                font-size: 0.85em;
+            }
+
+            .bill-table {
+                font-size: 12px;
+            }
+
+            .bill-table th,
+            .bill-table td {
+                padding: 6px 4px;
+            }
+
+            .bill-actions {
+                flex-direction: column;
+            }
+
+            .bill-summary {
+                font-size: 14px;
+            }
+
+            .bill-total {
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .main-content {
+                padding: 10px;
+                gap: 15px;
+            }
+
+            .section {
+                padding: 12px;
+            }
+
+            .items-table {
+                font-size: 11px;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 6px 2px;
+            }
+
+            /* Make table scrollable on very small screens */
+            .items-table-wrapper {
+                overflow-x: auto;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+
+            input, select {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .bill-content {
+                padding: 15px;
+            }
+
+            .bill-table {
+                font-size: 11px;
+            }
+        }
+
+        /* Print Bill Styles */
+        .bill-preview {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .bill-preview.active {
+            display: flex;
+        }
+
+        .bill-content {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+
+        .bill-header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .bill-header h1 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .bill-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .bill-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .bill-table th {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #333;
+        }
+
+        .bill-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .bill-summary {
+            text-align: right;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+        }
+
+        .bill-summary div {
+            margin: 5px 0;
+        }
+
+        .bill-total {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 10px;
+        }
+
+        .bill-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+            font-style: italic;
+        }
+
+        .bill-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .bill-actions button {
+            flex: 1;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .bill-preview, .bill-preview * {
+                visibility: visible;
+            }
+            .bill-preview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                background: white;
+            }
+            .bill-actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Fresh Mart Grocery</h1>
+            <p>Your Friendly Neighborhood Store</p>
+        </div>
+
+        <div class="main-content">
+            <div class="section">
+                <h2>Add Item</h2>
+                <div class="form-group">
+                    <label for="itemName">Item Name</label>
+                    <select id="itemName">
+                        <option value="">Select Item</option>
+                        <option value="Apple">Apple</option>
+                        <option value="Banana">Banana</option>
+                        <option value="Orange">Orange</option>
+                        <option value="Milk">Milk</option>
+                        <option value="Bread">Bread</option>
+                        <option value="Eggs">Eggs</option>
+                        <option value="Rice">Rice (1kg)</option>
+                        <option value="Sugar">Sugar (1kg)</option>
+                        <option value="Oil">Cooking Oil (1L)</option>
+                        <option value="Tomato">Tomato</option>
+                        <option value="Potato">Potato</option>
+                        <option value="Onion">Onion</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" id="quantity" min="1" value="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price per Unit (₹)</label>
+                    <input type="number" id="price" step="0.01" min="0">
+                </div>
+
+                <button class="btn" onclick="addItem()">Add to Bill</button>
+
+                <div class="summary">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">₹0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax (5%):</span>
+                        <span id="tax">₹0.00</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Total:</span>
+                        <span id="total">₹0.00</span>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="printBill()">Print Bill</button>
+                <button class="btn btn-secondary" onclick="downloadBill()">Download Bill (PDF)</button>
+                <button class="btn btn-secondary" onclick="clearAll()">Clear All</button>
+            </div>
+
+            <div class="section">
+                <h2>Bill Items</h2>
+                <div class="items-table-wrapper">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: #999;">No items added yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill Preview Modal -->
+    <div class="bill-preview" id="billPreview">
+        <div class="bill-content" id="billContent">
+            <div class="bill-header">
+                <h1>🛒 FRESH MART GROCERY</h1>
+                <p>123 Main Street, City - 600001</p>
+                <p>Phone: +91 98765 43210 | Email: info@freshmart.com</p>
+            </div>
+
+            <div class="bill-info">
+                <strong>Invoice No:</strong> <span id="invoiceNo"></span><br>
+                <strong>Date:</strong> <span id="billDate"></span><br>
+                <strong>Time:</strong> <span id="billTime"></span>
+            </div>
+
+            <table class="bill-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="billItems"></tbody>
+            </table>
+
+            <div class="bill-summary">
+                <div>Subtotal: <span id="billSubtotal"></span></div>
+                <div>Tax (5%): <span id="billTax"></span></div>
+                <div class="bill-total">TOTAL: <span id="billTotal"></span></div>
+            </div>
+
+            <div class="bill-footer">
+                <p>Thank you for shopping with us!</p>
+                <p>Visit Again 😊</p>
+            </div>
+
+            <div class="bill-actions">
+                <button class="btn" onclick="window.print()">Print Bill</button>
+                <button class="btn" onclick="downloadPDF()">Download PDF</button>
+                <button class="btn btn-secondary" onclick="closeBill()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let items = [];
+
+        const itemPrices = {
+            'Apple': 120,
+            'Banana': 50,
+            'Orange': 80,
+            'Milk': 60,
+            'Bread': 40,
+            'Eggs': 80,
+            'Rice': 60,
+            'Sugar': 45,
+            'Oil': 150,
+            'Tomato': 40,
+            'Potato': 30,
+            'Onion': 35
+        };
+
+        document.getElementById('itemName').addEventListener('change', function() {
+            const item = this.value;
+            if (item && itemPrices[item]) {
+                document.getElementById('price').value = itemPrices[item];
+            }
+        });
+
+        function addItem() {
+            const name = document.getElementById('itemName').value;
+            const qty = parseInt(document.getElementById('quantity').value);
+            const price = parseFloat(document.getElementById('price').value);
+
+            if (!name || !qty || !price) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const total = qty * price;
+            items.push({ name, qty, price, total });
+
+            updateTable();
+            updateSummary();
+
+            document.getElementById('itemName').value = '';
+            document.getElementById('quantity').value = 1;
+            document.getElementById('price').value = '';
+        }
+
+        function deleteItem(index) {
+            items.splice(index, 1);
+            updateTable();
+            updateSummary();
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('itemsBody');
+            
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #999;">No items added yet</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = items.map((item, index) => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>₹${item.price.toFixed(2)}</td>
+                    <td>₹${item.total.toFixed(2)}</td>
+                    <td><button class="delete-btn" onclick="deleteItem(${index})">Delete</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function updateSummary() {
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+
+            document.getElementById('subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('tax').textContent = `₹${tax.toFixed(2)}`;
+            document.getElementById('total').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function generateBill() {
+            if (items.length === 0) {
+                alert('No items to generate bill');
+                return;
+            }
+
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+
+            let billText = '====== FRESH MART GROCERY ======\n\n';
+            billText += 'Date: ' + new Date().toLocaleDateString() + '\n';
+            billText += 'Time: ' + new Date().toLocaleTimeString() + '\n\n';
+            billText += '--------------------------------\n';
+            
+            items.forEach(item => {
+                billText += `${item.name}\n`;
+                billText += `  ${item.qty} x ₹${item.price.toFixed(2)} = ₹${item.total.toFixed(2)}\n`;
+            });
+            
+            billText += '--------------------------------\n';
+            billText += `Subtotal: ₹${subtotal.toFixed(2)}\n`;
+            billText += `Tax (5%): ₹${tax.toFixed(2)}\n`;
+            billText += `TOTAL: ₹${total.toFixed(2)}\n`;
+            billText += '================================\n';
+            billText += 'Thank you for shopping with us!\n';
+
+            alert(billText);
+            console.log(billText);
+        }
+
+        function printBill() {
+            if (items.length === 0) {
+                alert('No items to print');
+                return;
+            }
+
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+
+            // Generate invoice number
+            const invoiceNo = 'INV' + Date.now().toString().slice(-8);
+            document.getElementById('invoiceNo').textContent = invoiceNo;
+            document.getElementById('billDate').textContent = new Date().toLocaleDateString();
+            document.getElementById('billTime').textContent = new Date().toLocaleTimeString();
+
+            // Populate bill items
+            const billItemsBody = document.getElementById('billItems');
+            billItemsBody.innerHTML = items.map(item => `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td>₹${item.price.toFixed(2)}</td>
+                    <td>₹${item.total.toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            // Update summary
+            document.getElementById('billSubtotal').textContent = '₹' + subtotal.toFixed(2);
+            document.getElementById('billTax').textContent = '₹' + tax.toFixed(2);
+            document.getElementById('billTotal').textContent = '₹' + total.toFixed(2);
+
+            // Show bill preview
+            document.getElementById('billPreview').classList.add('active');
+        }
+
+        function closeBill() {
+            document.getElementById('billPreview').classList.remove('active');
+        }
+
+        function downloadBill() {
+            if (items.length === 0) {
+                alert('No items to download');
+                return;
+            }
+            printBill();
+        }
+
+        function downloadPDF() {
+            // Create a simple text-based bill for download
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+            const invoiceNo = 'INV' + Date.now().toString().slice(-8);
+
+            let billText = '========================================\n';
+            billText += '       FRESH MART GROCERY\n';
+            billText += '   123 Main Street, City - 600001\n';
+            billText += '   Phone: +91 98765 43210\n';
+            billText += '========================================\n\n';
+            billText += 'Invoice No: ' + invoiceNo + '\n';
+            billText += 'Date: ' + new Date().toLocaleDateString() + '\n';
+            billText += 'Time: ' + new Date().toLocaleTimeString() + '\n\n';
+            billText += '----------------------------------------\n';
+            billText += 'Item                Qty  Price   Amount\n';
+            billText += '----------------------------------------\n';
+            
+            items.forEach(item => {
+                const itemName = item.name.padEnd(18);
+                const qty = item.qty.toString().padStart(3);
+                const price = ('₹' + item.price.toFixed(2)).padStart(7);
+                const amount = ('₹' + item.total.toFixed(2)).padStart(8);
+                billText += `${itemName} ${qty} ${price} ${amount}\n`;
+            });
+            
+            billText += '----------------------------------------\n';
+            billText += `Subtotal:                   ₹${subtotal.toFixed(2)}\n`;
+            billText += `Tax (5%):                   ₹${tax.toFixed(2)}\n`;
+            billText += `TOTAL:                      ₹${total.toFixed(2)}\n`;
+            billText += '========================================\n';
+            billText += '    Thank you for shopping with us!\n';
+            billText += '              Visit Again 😊\n';
+            billText += '========================================\n';
+
+            // Create and download the file
+            const blob = new Blob([billText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Bill_${invoiceNo}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            alert('Bill downloaded successfully!');
+        }
+
+        function clearAll() {
+            if (items.length === 0 || confirm('Are you sure you want to clear all items?')) {
+                items = [];
+                updateTable();
+                updateSummary();
+            }
+        }
+    </script>
+</body>
+</html>
